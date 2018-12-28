@@ -40,3 +40,5 @@ def prepare_embeddings(model, datasets, question_cols):
     for word, index in vocabulary.items():
         if word in model.vocab:
             embeddings[index] = model.word_vec(word)
+
+    return embeddings

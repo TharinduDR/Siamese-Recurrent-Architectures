@@ -54,10 +54,10 @@ def run_gru_benchmark(train_df, test_df, questions_cols, validation_portion, n_h
     encoded_right = embedding_layer(right_input)
 
     # Since this is a siamese network, both sides share the same LSTM
-    shared_lstm = GRU(n_hidden, name='gru')
+    shared_gru = GRU(n_hidden, name='gru')
 
-    left_output = shared_lstm(encoded_left)
-    right_output = shared_lstm(encoded_right)
+    left_output = shared_gru(encoded_left)
+    right_output = shared_gru(encoded_right)
 
     # Calculates the distance as defined by the MaLSTM model
     magru_distance = Lambda(function=lambda x: exponent_neg_manhattan_distance(x[0], x[1]),
@@ -85,4 +85,4 @@ def run_gru_benchmark(train_df, test_df, questions_cols, validation_portion, n_h
     for sim in sims:
         formatted_sims.append(sim[0])
 
-    return formatted_sims, magru
+    return formatted_sims, magru_trained

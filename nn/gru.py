@@ -60,21 +60,29 @@ def run_gru_benchmark(train_df, test_df, questions_cols, validation_portion, n_h
     right_output = shared_lstm(encoded_right)
 
     # Calculates the distance as defined by the MaLSTM model
-    malstm_distance = Lambda(function=lambda x: exponent_neg_manhattan_distance(x[0], x[1]),
+    magru_distance = Lambda(function=lambda x: exponent_neg_manhattan_distance(x[0], x[1]),
                              output_shape=lambda x: (x[0][0], 1))([left_output, right_output])
 
     # Pack it all up into a model
-    malstm = Model([left_input, right_input], [malstm_distance])
+    magru = Model([left_input, right_input], [magru_distance])
 
     # Adadelta optimizer, with gradient clipping by norm
     optimizer = Adadelta(clipnorm=gradient_clipping_norm)
     # optimizer = optimizers.Nadam(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=None, schedule_decay=0.004)
 
     #malstm.load_weights('gru_weights.h5', by_name=True)
-    malstm.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
+    magru.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
-    malstm_trained = malstm.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
+    magru_trained = magru.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
                                 validation_data=([X_validation['left'], X_validation['right']], Y_validation))
 
+    for dataset, side in itertools.product([X_test], ['left', 'right']):
+        dataset[side] = pad_sequences(dataset[side], maxlen=max_seq_length)
 
+    sims = magru.predict([X_test['left'], X_test['right']], batch_size=batch_size)
+    formatted_sims = []
 
+    for sim in sims:
+        formatted_sims.append(sim[0])
+
+    return formatted_sims, magru

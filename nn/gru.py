@@ -10,10 +10,10 @@ from nn.util.distances import exponent_neg_manhattan_distance
 from preprocessing.embeddings import prepare_embeddings
 
 
-def run_gru_benchmark(train_df, test_df, questions_cols, validation_portion, n_hidden, embedding_dim, gradient_clipping_norm, batch_size, n_epoch, model):
+def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300, gradient_clipping_norm=1.25, batch_size=64 , n_epoch=500, model=None):
 
     datasets = [train_df, test_df]
-    embeddings = prepare_embeddings(datasets=datasets, question_cols=questions_cols, model=model)
+    embeddings = prepare_embeddings(datasets=datasets, question_cols=sent_cols, model=model)
 
     max_seq_length = max(train_df.sent_1.map(lambda x: len(x)).max(),
                          train_df.sent_2.map(lambda x: len(x)).max(),
@@ -21,11 +21,11 @@ def run_gru_benchmark(train_df, test_df, questions_cols, validation_portion, n_h
                          test_df.sent_2.map(lambda x: len(x)).max())
 
     # Split to train validation
-    validation_size = validation_portion * len(train_df)
+    validation_size = int(validation_portion * len(train_df))
     training_size = len(train_df) - validation_size
 
-    X = train_df[questions_cols]
-    Y = train_df['sim']
+    X = train_df[sent_cols]
+    Y = train_df[sim_col]
 
     X_train, X_validation, Y_train, Y_validation = train_test_split(X, Y, test_size=validation_size)
 
@@ -73,7 +73,7 @@ def run_gru_benchmark(train_df, test_df, questions_cols, validation_portion, n_h
     #malstm.load_weights('gru_weights.h5', by_name=True)
     magru.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
-    magru_trained = magru.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
+    magru_trained = magru.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch, verbose=0,
                                 validation_data=([X_validation['left'], X_validation['right']], Y_validation))
 
     for dataset, side in itertools.product([X_test], ['left', 'right']):

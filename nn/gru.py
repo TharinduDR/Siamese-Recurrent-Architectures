@@ -10,7 +10,7 @@ from nn.util.distances import exponent_neg_manhattan_distance
 from preprocessing.embeddings import prepare_embeddings
 
 
-def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300 , batch_size=64 , n_epoch=500, optimizer=None, model=None):
+def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300 , batch_size=64 , n_epoch=500, optimizer=None, save_weights=None, load_weights=None, model=None):
 
     datasets = [train_df, test_df]
     embeddings = prepare_embeddings(datasets=datasets, question_cols=sent_cols, model=model)
@@ -71,11 +71,16 @@ def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=
     # optimizer = optimizers.Nadam(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=None, schedule_decay=0.004)
     optimizer = optimizer
 
-    #malstm.load_weights('gru_weights.h5', by_name=True)
+    if load_weights is not None:
+        magru.load_weights(load_weights, by_name=True)
+
     magru.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
     magru_trained = magru.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch, verbose=0,
                                 validation_data=([X_validation['left'], X_validation['right']], Y_validation))
+
+    if save_weights is not None:
+        magru.save_weights(save_weights)
 
     for dataset, side in itertools.product([X_test], ['left', 'right']):
         dataset[side] = pad_sequences(dataset[side], maxlen=max_seq_length)

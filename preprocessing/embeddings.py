@@ -1,9 +1,9 @@
 import numpy as np
+
 from preprocessing.cleaning import text_to_word_list
 
 
 def prepare_embeddings(model, datasets, question_cols):
-
     vocabulary = dict()
     inverse_vocabulary = ['<unk>']
     questions_cols = question_cols

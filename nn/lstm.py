@@ -1,8 +1,7 @@
 import itertools
 
 from keras import Input, Model
-from keras.layers import Embedding, GRU, Lambda, LSTM
-from keras.optimizers import Adadelta
+from keras.layers import Embedding, Lambda, LSTM
 from keras_preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 
@@ -10,8 +9,8 @@ from nn.util.distances import exponent_neg_manhattan_distance
 from preprocessing.embeddings import prepare_embeddings
 
 
-def run_lstm_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300, batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None, model=None):
-
+def run_lstm_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300,
+                       batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None, model=None):
     datasets = [train_df, test_df]
     embeddings = prepare_embeddings(datasets=datasets, question_cols=sent_cols, model=model)
 
@@ -22,7 +21,7 @@ def run_lstm_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion
 
     # Split to train validation
     validation_size = int(validation_portion * len(train_df))
-    #validation_size = 400
+    # validation_size = 400
     training_size = len(train_df) - validation_size
 
     X = train_df[sent_cols]
@@ -67,14 +66,15 @@ def run_lstm_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion
     # Pack it all up into a model
     malstm = Model([left_input, right_input], [malstm_distance])
 
-    optimizer=optimizer
+    optimizer = optimizer
 
     if load_weights is not None:
         malstm.load_weights(load_weights, by_name=True)
 
     malstm.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
-    malstm_trained = malstm.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch, verbose=0,
+    malstm_trained = malstm.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
+                                verbose=0,
                                 validation_data=([X_validation['left'], X_validation['right']], Y_validation))
 
     if save_weights is not None:

@@ -2,7 +2,6 @@ import itertools
 
 from keras import Input, Model
 from keras.layers import Embedding, GRU, Lambda
-from keras.optimizers import Adadelta
 from keras_preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 
@@ -10,8 +9,8 @@ from nn.util.distances import exponent_neg_manhattan_distance
 from preprocessing.embeddings import prepare_embeddings
 
 
-def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300 , batch_size=64 , n_epoch=500, optimizer=None, save_weights=None, load_weights=None, model=None):
-
+def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300,
+                      batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None, model=None):
     datasets = [train_df, test_df]
     embeddings = prepare_embeddings(datasets=datasets, question_cols=sent_cols, model=model)
 
@@ -61,13 +60,13 @@ def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=
 
     # Calculates the distance as defined by the MaLSTM model
     magru_distance = Lambda(function=lambda x: exponent_neg_manhattan_distance(x[0], x[1]),
-                             output_shape=lambda x: (x[0][0], 1))([left_output, right_output])
+                            output_shape=lambda x: (x[0][0], 1))([left_output, right_output])
 
     # Pack it all up into a model
     magru = Model([left_input, right_input], [magru_distance])
 
     # Adadelta optimizer, with gradient clipping by norm
-    #optimizer = Adadelta(clipnorm=gradient_clipping_norm)
+    # optimizer = Adadelta(clipnorm=gradient_clipping_norm)
     # optimizer = optimizers.Nadam(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=None, schedule_decay=0.004)
     optimizer = optimizer
 
@@ -76,8 +75,9 @@ def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=
 
     magru.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
-    magru_trained = magru.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch, verbose=0,
-                                validation_data=([X_validation['left'], X_validation['right']], Y_validation))
+    magru_trained = magru.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
+                              verbose=0,
+                              validation_data=([X_validation['left'], X_validation['right']], Y_validation))
 
     if save_weights is not None:
         magru.save_weights(save_weights)

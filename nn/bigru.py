@@ -1,7 +1,7 @@
 import itertools
 
 from keras import Input, Model
-from keras.layers import Embedding, GRU, Lambda
+from keras.layers import Embedding, GRU, Lambda, Bidirectional
 from keras_preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 
@@ -9,7 +9,7 @@ from nn.util.distances import exponent_neg_manhattan_distance
 from preprocessing.embeddings import prepare_embeddings
 
 
-def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300,
+def run_bigru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300,
                       batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None, model=None):
     datasets = [train_df, test_df]
     embeddings = prepare_embeddings(datasets=datasets, question_cols=sent_cols, model=model)
@@ -53,7 +53,7 @@ def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=
     encoded_right = embedding_layer(right_input)
 
     # Since this is a siamese network, both sides share the same LSTM
-    shared_gru = GRU(n_hidden, name='gru')
+    shared_gru = Bidirectional(GRU(n_hidden, name='gru'))
 
     left_output = shared_gru(encoded_left)
     right_output = shared_gru(encoded_right)

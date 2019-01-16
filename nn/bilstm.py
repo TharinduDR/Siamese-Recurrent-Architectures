@@ -1,7 +1,7 @@
 import itertools
 
 from keras import Input, Model
-from keras.layers import Embedding, Lambda, LSTM
+from keras.layers import Embedding, Lambda, LSTM, Bidirectional
 from keras_preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 
@@ -9,7 +9,7 @@ from nn.util.distances import exponent_neg_manhattan_distance
 from preprocessing.embeddings import prepare_embeddings
 
 
-def run_lstm_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300,
+def run_bilstm_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300,
                        batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None, model=None):
     datasets = [train_df, test_df]
     embeddings = prepare_embeddings(datasets=datasets, question_cols=sent_cols, model=model)
@@ -54,36 +54,36 @@ def run_lstm_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion
     encoded_right = embedding_layer(right_input)
 
     # Since this is a siamese network, both sides share the same LSTM
-    shared_lstm = LSTM(n_hidden, name="lstm")
+    shared_lstm = Bidirectional(LSTM(n_hidden, name="lstm"))
 
     left_output = shared_lstm(encoded_left)
     right_output = shared_lstm(encoded_right)
 
     # Calculates the distance as defined by the MaLSTM model
-    malstm_distance = Lambda(function=lambda x: exponent_neg_manhattan_distance(x[0], x[1]),
+    mabilstm_distance = Lambda(function=lambda x: exponent_neg_manhattan_distance(x[0], x[1]),
                              output_shape=lambda x: (x[0][0], 1))([left_output, right_output])
 
     # Pack it all up into a model
-    malstm = Model([left_input, right_input], [malstm_distance])
+    mabilstm = Model([left_input, right_input], [mabilstm_distance])
 
     optimizer = optimizer
 
     if load_weights is not None:
-        malstm.load_weights(load_weights, by_name=True)
+        mabilstm.load_weights(load_weights, by_name=True)
 
-    malstm.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
+    mabilstm.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
-    malstm_trained = malstm.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
+    malstm_trained = mabilstm.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
                                 verbose=0,
                                 validation_data=([X_validation['left'], X_validation['right']], Y_validation))
 
     if save_weights is not None:
-        malstm.save_weights(save_weights)
+        mabilstm.save_weights(save_weights)
 
     for dataset, side in itertools.product([X_test], ['left', 'right']):
         dataset[side] = pad_sequences(dataset[side], maxlen=max_seq_length)
 
-    sims = malstm.predict([X_test['left'], X_test['right']], batch_size=batch_size)
+    sims = mabilstm.predict([X_test['left'], X_test['right']], batch_size=batch_size)
     formatted_sims = []
 
     for sim in sims:

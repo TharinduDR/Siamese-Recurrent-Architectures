@@ -10,7 +10,7 @@ from preprocessing.embeddings import prepare_embeddings
 
 
 def run_bilstm_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300,
-                       batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None, model=None):
+                         batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None, model=None):
     datasets = [train_df, test_df]
     embeddings = prepare_embeddings(datasets=datasets, question_cols=sent_cols, model=model)
 
@@ -61,7 +61,7 @@ def run_bilstm_benchmark(train_df, test_df, sent_cols, sim_col, validation_porti
 
     # Calculates the distance as defined by the MaLSTM model
     mabilstm_distance = Lambda(function=lambda x: exponent_neg_manhattan_distance(x[0], x[1]),
-                             output_shape=lambda x: (x[0][0], 1))([left_output, right_output])
+                               output_shape=lambda x: (x[0][0], 1))([left_output, right_output])
 
     # Pack it all up into a model
     mabilstm = Model([left_input, right_input], [mabilstm_distance])
@@ -74,8 +74,8 @@ def run_bilstm_benchmark(train_df, test_df, sent_cols, sim_col, validation_porti
     mabilstm.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
     malstm_trained = mabilstm.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
-                                verbose=0,
-                                validation_data=([X_validation['left'], X_validation['right']], Y_validation))
+                                  verbose=0,
+                                  validation_data=([X_validation['left'], X_validation['right']], Y_validation))
 
     if save_weights is not None:
         mabilstm.save_weights(save_weights)

@@ -1,7 +1,7 @@
 import itertools
 
 from keras import Input, Model
-from keras.layers import Embedding, Lambda, LSTM
+from keras.layers import Embedding, Lambda, LSTM, Dense
 from keras_preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 
@@ -10,7 +10,7 @@ from nn.util.distances import exponent_neg_manhattan_distance
 from preprocessing.embeddings import prepare_embeddings
 
 
-def run_lstm_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300,
+def run_lstm_attention_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300,
                        batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None, model=None):
     datasets = [train_df, test_df]
     embeddings = prepare_embeddings(datasets=datasets, question_cols=sent_cols, model=model)
@@ -55,11 +55,13 @@ def run_lstm_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion
     encoded_right = embedding_layer(right_input)
 
     # Since this is a siamese network, both sides share the same LSTM
-    shared_attention_lstm = LSTM(n_hidden, name="lstm")
-    shared_attention_lstm = Attention(max_seq_length)(shared_attention_lstm)
+    shared_attention_lstm = LSTM(n_hidden, return_sequences=True, name="lstm")
 
     left_output = shared_attention_lstm(encoded_left)
+    left_output = Attention(max_seq_length)(left_output)
+
     right_output = shared_attention_lstm(encoded_right)
+    right_output = Attention(max_seq_length)(right_output)
 
     # Calculates the distance as defined by the MaLSTM model
     malstm_distance = Lambda(function=lambda x: exponent_neg_manhattan_distance(x[0], x[1]),

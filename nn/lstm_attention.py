@@ -58,14 +58,15 @@ def run_lstm_attention_benchmark(train_df, test_df, sent_cols, sim_col, validati
     encoded_left = embedding_layer(left_input)
     encoded_right = embedding_layer(right_input)
 
-    # Since this is a siamese network, both sides share the same LSTM
-    shared_attention_lstm = LSTM(n_hidden, return_sequences=True, name="lstm")
+    # Since this is a siamese network, both sides share the same LSTM and attention
+    shared_lstm = LSTM(n_hidden, return_sequences=True, name="lstm")
+    shared_attention = Attention(max_seq_length, name="attention")
 
-    left_output = shared_attention_lstm(encoded_left)
-    left_output = Attention(max_seq_length, name="left_attention")(left_output)
+    left_output = shared_lstm(encoded_left)
+    left_output = shared_attention(left_output)
 
-    right_output = shared_attention_lstm(encoded_right)
-    right_output = Attention(max_seq_length, name="right_attention")(right_output)
+    right_output = shared_lstm(encoded_right)
+    right_output = shared_attention(right_output)
 
     # Calculates the distance as defined by the MaLSTM model
     malstm_distance = Lambda(function=lambda x: exponent_neg_manhattan_distance(x[0], x[1]),

@@ -19,3 +19,31 @@ The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MALSTM
 
 The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MAGRU.ipynb).
 
+-----------------------------------------------------------------------------------------------------
+### MABILSTM
+#### Architecture
+![Alt text](nn/images/MABILSTM.jpg)
+
+The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MABILSTM.ipynb).
+
+-----------------------------------------------------------------------------------------------------
+### MABIGRU
+#### Architecture
+![Alt text](nn/images/MABIGRU.jpg)
+
+The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MABIGRU.ipynb).
+
+-----------------------------------------------------------------------------------------------------
+### MALSTM-ATTENTION
+#### Architecture
+![Alt text](nn/images/MALSTM-ATTENTION.jpg)
+
+The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MALSTM-ATTENTION.ipynb).
+
+-----------------------------------------------------------------------------------------------------
+### MAGRU-ATTENTION
+#### Architecture
+![Alt text](nn/images/MAGRU-ATTENTION.jpg)
+
+The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MAGRU-ATTENTION.ipynb).
+

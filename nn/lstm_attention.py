@@ -60,7 +60,7 @@ def run_lstm_attention_benchmark(train_df, test_df, sent_cols, sim_col, validati
 
     # Since this is a siamese network, both sides share the same LSTM and attention
     shared_lstm = LSTM(n_hidden, return_sequences=True, name="lstm")
-    shared_attention = Attention(max_seq_length, name="attention")
+    shared_attention = Attention(max_seq_length)
 
     left_output = shared_lstm(encoded_left)
     left_output = shared_attention(left_output)

@@ -8,6 +8,7 @@ This project tries to dig deep in to siamese networks to outperform the MALSTM p
 
 #### Architecture
 ![Alt text](nn/images/MALSTM.jpg)
+
 The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MALSTM.ipynb).
 
  
@@ -15,5 +16,6 @@ The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MALSTM
 
 #### Architecture
 ![Alt text](nn/images/MAGRU.jpg)
+
 The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MAGRU.ipynb).
 

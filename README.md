@@ -4,13 +4,15 @@ Siamese networks are networks that have two or more identical sub-networks in th
 
 This project tries to dig deep in to siamese networks to outperform the MALSTM performance. Following architectures have been considered.
 
+
+----------------------------------------------------------------------------------------------------
 ### MALSTM (Original Paper)
 #### Architecture
 ![Alt text](nn/images/MALSTM.jpg)
 
 The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MALSTM.ipynb).
 
- 
+-----------------------------------------------------------------------------------------------------
 ### MAGRU
 #### Architecture
 ![Alt text](nn/images/MAGRU.jpg)

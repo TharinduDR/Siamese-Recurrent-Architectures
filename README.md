@@ -71,4 +71,9 @@ The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MALSTM
 ![Alt text](nn/images/MAGRU-ATTENTION.jpg)
 
 The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MAGRU-ATTENTION.ipynb).
+Best result was, 
+
+| Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 
+| ----------|------------------| ------------|---------|----|-------|--------|
+| Adadelta  | False | False |word2vec|0.149|0.818|0.751
 

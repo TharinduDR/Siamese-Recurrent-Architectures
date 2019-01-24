@@ -11,6 +11,11 @@ This project tries to dig deep in to siamese networks to outperform the MALSTM p
 ![Alt text](nn/images/MALSTM.jpg)
 
 The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MALSTM.ipynb).
+Best result was,
+
+| Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 
+| ----------|------------------| ------------|---------|----|-------|--------|
+| Adagrad  | False | False |word2vec|0.153|0.809|0.741
 
 -----------------------------------------------------------------------------------------------------
 ### MAGRU
@@ -18,6 +23,12 @@ The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MALSTM
 ![Alt text](nn/images/MAGRU.jpg)
 
 The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MAGRU.ipynb).
+Best result was,
+
+| Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 
+| ----------|------------------| ------------|---------|----|-------|--------|
+| Adadelta  | True | True |word2vec|0.140|0.838|0.780
+
 
 -----------------------------------------------------------------------------------------------------
 ### MABILSTM
@@ -25,6 +36,11 @@ The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MAGRU.
 ![Alt text](nn/images/MABILSTM.jpg)
 
 The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MABILSTM.ipynb).
+Best result was,
+
+| Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 
+| ----------|------------------| ------------|---------|----|-------|--------|
+| Adadelta  | True | False |word2vec|0.164|0.784|0.708
 
 -----------------------------------------------------------------------------------------------------
 ### MABIGRU
@@ -32,6 +48,11 @@ The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MABILS
 ![Alt text](nn/images/MABIGRU.jpg)
 
 The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MABIGRU.ipynb).
+Best result was,
+
+| Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 
+| ----------|------------------| ------------|---------|----|-------|--------|
+| Adadelta  | True | True |word2vec|0.143|0.832|0.773
 
 -----------------------------------------------------------------------------------------------------
 ### MALSTM-ATTENTION

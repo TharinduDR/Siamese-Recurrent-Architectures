@@ -15,7 +15,11 @@ Best result was,
 
 | Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 
 | ----------|------------------| ------------|---------|----|-------|--------|
-| Adagrad  | False | False |word2vec|0.153|0.809|0.741
+| Adagrad  | False | False |word2vec|0.153|0.809|0.741|
+| Adadelta<sup>✞</sup> | True<sup>✞</sup> | True<sup>✞</sup>| word2vec<sup>✞</sup>| 0.156<sup>✞</sup> |0.802<sup>✞</sup>|0.733<sup>✞</sup>
+
+
+<sup>✞</sup>denotes the original paper.
 
 -----------------------------------------------------------------------------------------------------
 ### MAGRU

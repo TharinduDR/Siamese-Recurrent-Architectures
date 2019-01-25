@@ -10,7 +10,7 @@ This project tries to dig deep in to siamese networks to outperform the MALSTM p
 #### Architecture
 ![Alt text](nn/images/MALSTM.jpg)
 
-The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MALSTM.ipynb).
+The experiments can be found [here](MALSTM.ipynb).
 Best result was,
 
 | Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 
@@ -26,7 +26,7 @@ Best result was,
 #### Architecture
 ![Alt text](nn/images/MAGRU.jpg)
 
-The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MAGRU.ipynb).
+The experiments can be found [here](MAGRU.ipynb).
 Best result was,
 
 | Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 
@@ -39,8 +39,9 @@ Best result was,
 #### Architecture
 ![Alt text](nn/images/MABILSTM.jpg)
 
-The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MABILSTM.ipynb).
+The experiments can be found [here](MABILSTM.ipynb).
 Best result was,
+
 
 | Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 
 | ----------|------------------| ------------|---------|----|-------|--------|
@@ -51,7 +52,7 @@ Best result was,
 #### Architecture
 ![Alt text](nn/images/MABIGRU.jpg)
 
-The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MABIGRU.ipynb).
+The experiments can be found [here](MABIGRU.ipynb).
 Best result was,
 
 | Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 
@@ -63,14 +64,18 @@ Best result was,
 #### Architecture
 ![Alt text](nn/images/MALSTM-ATTENTION.jpg)
 
-The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MALSTM-ATTENTION.ipynb).
+The experiments can be found [here](MALSTM-ATTENTION.ipynb).
+Best result was,
+| Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 
+| ----------|------------------| ------------|---------|----|-------|--------|
+| Adagrad  | False | False |word2vec|0.145|0.827|0.765
 
 -----------------------------------------------------------------------------------------------------
 ### MAGRU-ATTENTION
 #### Architecture
 ![Alt text](nn/images/MAGRU-ATTENTION.jpg)
 
-The experiments can be found [here](Siamese-Recurrent-Architectures%20-%20MAGRU-ATTENTION.ipynb).
+The experiments can be found [here](MAGRU-ATTENTION.ipynb).
 Best result was, 
 
 | Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 

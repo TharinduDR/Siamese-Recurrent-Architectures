@@ -66,6 +66,7 @@ Best result was,
 
 The experiments can be found [here](MALSTM-ATTENTION.ipynb).
 Best result was,
+
 | Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 
 | ----------|------------------| ------------|---------|----|-------|--------|
 | Adagrad  | False | False |word2vec|0.145|0.827|0.765

@@ -10,14 +10,16 @@ from preprocessing.embeddings import prepare_embeddings
 
 
 def run_bilstm_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300,
-                         batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None, model=None):
+                         batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None,
+                         max_seq_length=None, model=None):
     datasets = [train_df, test_df]
     embeddings = prepare_embeddings(datasets=datasets, question_cols=sent_cols, model=model)
 
-    max_seq_length = max(train_df.sent_1.map(lambda x: len(x)).max(),
-                         train_df.sent_2.map(lambda x: len(x)).max(),
-                         test_df.sent_1.map(lambda x: len(x)).max(),
-                         test_df.sent_2.map(lambda x: len(x)).max())
+    if max_seq_length is None:
+        max_seq_length = max(train_df.sent_1.map(lambda x: len(x)).max(),
+                             train_df.sent_2.map(lambda x: len(x)).max(),
+                             test_df.sent_1.map(lambda x: len(x)).max(),
+                             test_df.sent_2.map(lambda x: len(x)).max())
 
     # Split to train validation
     validation_size = int(validation_portion * len(train_df))

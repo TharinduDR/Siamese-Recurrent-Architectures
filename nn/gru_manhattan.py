@@ -12,7 +12,7 @@ from preprocessing.embeddings import prepare_embeddings
 
 def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100, embedding_dim=300,
                       batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None,
-                      max_seq_length=None, model=None):
+                      max_seq_length=None, reduce_lr=None, earlystopping=None, model=None):
     datasets = [train_df, test_df]
     embeddings = prepare_embeddings(datasets=datasets, question_cols=sent_cols, model=model)
 
@@ -75,14 +75,19 @@ def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=
 
     magru.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
-    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.6, patience=1, min_lr=0.0001, verbose=2)
-    earlystopping = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=50, verbose=2, mode='auto')
+    callbacks = []
 
-    callbacks = [earlystopping, reduce_lr]
+    if earlystopping is True:
+        earlystopping = EarlyStopping(monitor='val_loss', min_delta=0.00001, patience=100, verbose=0, mode='auto')
+        callbacks.append(earlystopping)
+
+    if reduce_lr is True:
+        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.6, patience=1, min_lr=0.0001, verbose=0)
+        callbacks.append(reduce_lr)
 
     if save_weights is not None:
-        checkpoint = ModelCheckpoint(save_weights, monitor='val_loss', verbose=2, save_best_only=True, mode='min')
-        callbacks = [checkpoint, reduce_lr, earlystopping]
+        checkpoint = ModelCheckpoint(save_weights, monitor='val_loss', verbose=0, save_best_only=True, mode='min')
+        callbacks.append(checkpoint)
         magru_trained = magru.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
                                   verbose=0,
                                   validation_data=([X_validation['left'], X_validation['right']], Y_validation),

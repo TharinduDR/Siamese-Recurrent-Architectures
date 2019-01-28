@@ -59,7 +59,7 @@ def run_gru_capsule_benchmark(train_df, test_df, sent_cols, sim_col, validation_
 
     # Since this is a siamese network, both sides share the same LSTM
     shared_gru = GRU(n_hidden, return_sequences=True, name='gru')
-    shared_capsule = Capsule(num_capsule=10, dim_capsule=10, routings=4, share_weights=True)
+    shared_capsule = Capsule(num_capsule=10, dim_capsule=10, routings=4, share_weights=True, name='capsule')
     shared_flatten = Flatten()
 
     left_output = shared_gru(encoded_left)
@@ -77,9 +77,6 @@ def run_gru_capsule_benchmark(train_df, test_df, sent_cols, sim_col, validation_
     # Pack it all up into a model
     magru = Model([left_input, right_input], [magru_distance])
 
-    # Adadelta optimizer, with gradient clipping by norm
-    # optimizer = Adadelta(clipnorm=gradient_clipping_norm)
-    # optimizer = optimizers.Nadam(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=None, schedule_decay=0.004)
     optimizer = optimizer
 
     if load_weights is not None:

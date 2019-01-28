@@ -1,6 +1,7 @@
 import itertools
 
 from keras import Input, Model
+from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint
 from keras.layers import Embedding, GRU, Lambda
 from keras_preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
@@ -67,9 +68,6 @@ def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=
     # Pack it all up into a model
     magru = Model([left_input, right_input], [magru_distance])
 
-    # Adadelta optimizer, with gradient clipping by norm
-    # optimizer = Adadelta(clipnorm=gradient_clipping_norm)
-    # optimizer = optimizers.Nadam(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=None, schedule_decay=0.004)
     optimizer = optimizer
 
     if load_weights is not None:
@@ -77,12 +75,24 @@ def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=
 
     magru.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
-    magru_trained = magru.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
-                              verbose=0,
-                              validation_data=([X_validation['left'], X_validation['right']], Y_validation))
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.6, patience=1, min_lr=0.0001, verbose=2)
+    earlystopping = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=50, verbose=2, mode='auto')
+
+    callbacks = [earlystopping, reduce_lr]
 
     if save_weights is not None:
-        magru.save_weights(save_weights)
+        checkpoint = ModelCheckpoint(save_weights, monitor='val_loss', verbose=2, save_best_only=True, mode='min')
+        callbacks = [checkpoint, reduce_lr, earlystopping]
+        magru_trained = magru.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
+                                  verbose=0,
+                                  validation_data=([X_validation['left'], X_validation['right']], Y_validation),
+                                  callbacks=callbacks)
+
+    else:
+        magru_trained = magru.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
+                                  verbose=0,
+                                  validation_data=([X_validation['left'], X_validation['right']], Y_validation),
+                                  callbacks=callbacks)
 
     for dataset, side in itertools.product([X_test], ['left', 'right']):
         dataset[side] = pad_sequences(dataset[side], maxlen=max_seq_length)

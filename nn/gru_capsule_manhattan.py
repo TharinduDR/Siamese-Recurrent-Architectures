@@ -1,7 +1,6 @@
 import itertools
 
 from keras import Input, Model
-from keras.callbacks import ReduceLROnPlateau
 from keras.layers import Embedding, GRU, Lambda, Flatten
 from keras_preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
@@ -14,7 +13,7 @@ from preprocessing.embeddings import prepare_embeddings
 def run_gru_capsule_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100,
                               embedding_dim=300,
                               batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None,
-                              max_seq_length=None, reduce_lr=False,
+                              max_seq_length=None,
                               model=None):
     datasets = [train_df, test_df]
     embeddings = prepare_embeddings(datasets=datasets, question_cols=sent_cols, model=model)
@@ -85,19 +84,9 @@ def run_gru_capsule_benchmark(train_df, test_df, sent_cols, sim_col, validation_
 
     magru.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
-    if reduce_lr is True:
-        callbacks = []
-        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.9, patience=20, min_lr=0.0001, verbose=0)
-        callbacks.append(reduce_lr)
-        magru_trained = magru.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
-                                  verbose=0,
-                                  validation_data=([X_validation['left'], X_validation['right']], Y_validation),
-                                  callbacks=callbacks)
-
-    else:
-        magru_trained = magru.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
-                                  verbose=0,
-                                  validation_data=([X_validation['left'], X_validation['right']], Y_validation))
+    magru_trained = magru.fit([X_train['left'], X_train['right']], Y_train, batch_size=batch_size, nb_epoch=n_epoch,
+                              verbose=0,
+                              validation_data=([X_validation['left'], X_validation['right']], Y_validation))
 
     if save_weights is not None:
         magru.save_weights(save_weights)

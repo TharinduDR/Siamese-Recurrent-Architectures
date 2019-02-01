@@ -17,3 +17,10 @@ def load_glove(path):
 def load_fasttext(path):
     fasttext = gensim.models.KeyedVectors.load_word2vec_format(path, binary=False)
     return fasttext
+
+
+def load_para(path):
+    tmp_file = "/tmp/paragram_300_sl999.txt"
+    glove2word2vec(path, tmp_file)
+    para = gensim.models.KeyedVectors.load_word2vec_format(tmp_file, unicode_errors="ignore")
+    return para

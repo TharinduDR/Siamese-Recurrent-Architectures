@@ -1,8 +1,10 @@
 import numpy as np
 
 from preprocessing.cleaning import text_to_word_list
+from utility.commons.decorators import deprecated
 
 
+@deprecated("Use method merge embeddings instead")
 def prepare_embeddings(model, datasets, question_cols):
     vocabulary = dict()
     inverse_vocabulary = ['<unk>']
@@ -76,13 +78,21 @@ def merge_embeddings(models, datasets, question_cols):
                 # Replace questions as word to question as number representationindex, question, q2n
                 dataset.set_value(index, question, q2n)
 
-    embedding_dim = 300
+    embedding_dim = 0
+    for model in models:
+        embedding_dim = embedding_dim + model.vector_size
     embeddings = 1 * np.random.randn(len(vocabulary) + 1, embedding_dim)  # This will be the embedding matrix
     embeddings[0] = 0  # So that the padding will be ignored
 
     # Build the embedding matrix
     for word, index in vocabulary.items():
-        if word in model.vocab:
-            embeddings[index] = model.word_vec(word)
 
-    return embeddings
+        counter = 0
+        for model in models:
+            if word in model.vocab:
+                if counter == 0:
+                    embeddings[index] = model.word_vec(word)
+                else:
+                    embeddings[index] = np.concatenate((embeddings[index], model.word_vec(word)), axis=0)
+            counter += 1
+    return embeddings, embedding_dim

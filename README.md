@@ -88,7 +88,7 @@ Best result was,
 #### Architecture
 ![Alt text](nn/images/MAGRU-CAPSULE.jpg)
 
-The experiments can be found [here](MAGRU-ATTENTION.ipynb).
+The experiments can be found [here](MAGRU-CAPSULE.ipynb).
 Best result was, 
 
 | Optimizer | Transfer Learning| Augmentation|Embedding|RMSE|Pearson|Spearman| 

@@ -3,10 +3,8 @@ from enum import Enum
 import numpy as np
 
 from preprocessing.cleaning import text_to_word_list
-from utility.commons.decorators import deprecated
 
 
-@deprecated("Use method merge embeddings instead")
 def prepare_embeddings(model, datasets, question_cols):
     vocabulary = dict()
     inverse_vocabulary = ['<unk>']
@@ -36,7 +34,7 @@ def prepare_embeddings(model, datasets, question_cols):
                 # Replace questions as word to question as number representationindex, question, q2n
                 dataset.set_value(index, question, q2n)
 
-    embedding_dim = 300
+    embedding_dim =  model.vector_size
     embeddings = 1 * np.random.randn(len(vocabulary) + 1, embedding_dim)  # This will be the embedding matrix
     embeddings[0] = 0  # So that the padding will be ignored
 
@@ -45,7 +43,7 @@ def prepare_embeddings(model, datasets, question_cols):
         if word in model.vocab:
             embeddings[index] = model.word_vec(word)
 
-    return embeddings
+    return embeddings, embedding_dim
 
 
 def merge_embeddings(models, datasets, question_cols, merge_operation):

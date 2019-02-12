@@ -1,19 +1,36 @@
 import itertools
 
 from keras import Input, Model
-from keras.layers import GRU, Lambda
+from keras.layers import Embedding, GRU, Lambda
 from keras_preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 
-from nn.layers.Elmo import ElmoEmbeddingLayer
-from nn.util.distances import exponent_neg_manhattan_distance
+from nn.util.distances import exponent_neg_euclidean_distance
+from preprocessing.embeddings import merge_embeddings, prepare_embeddings, prepare_arabic_embeddings, \
+    prepare_spanish_embeddings
+from utility.commons.languages import Language
 
 
-def run_gru_elmo_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100,
-                           embedding_dim=300,
-                           batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None,
-                           max_seq_length=None, model=None):
+def run_experimental_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=0.1, n_hidden=100,
+                                   batch_size=64, n_epoch=500, optimizer=None, save_weights=None, load_weights=None,
+                                   max_seq_length=None, merge_operation=None, language=None, models=None):
     datasets = [train_df, test_df]
+
+    if merge_operation is not None:
+        embeddings, embedding_dim = merge_embeddings(datasets=datasets, question_cols=sent_cols,
+                                                     merge_operation=merge_operation, models=models)
+    else:
+        if language is Language.ARABIC:
+            embeddings, embedding_dim = prepare_arabic_embeddings(datasets=datasets, question_cols=sent_cols,
+                                                                  model=models[0])
+
+        elif language is Language.SPANISH:
+            embeddings, embedding_dim = prepare_spanish_embeddings(datasets=datasets, question_cols=sent_cols,
+                                                                   model=models[0])
+
+        else:
+            embeddings, embedding_dim = prepare_embeddings(datasets=datasets, question_cols=sent_cols,
+                                                           model=models[0])
 
     if max_seq_length is None:
         max_seq_length = max(train_df.sent_1.map(lambda x: len(x)).max(),
@@ -40,24 +57,21 @@ def run_gru_elmo_benchmark(train_df, test_df, sent_cols, sim_col, validation_por
     Y_validation = Y_validation.values
 
     # Zero padding
-    # for dataset, side in itertools.product([X_train, X_validation], ['left', 'right']):
-    #     dataset[side] = pad_sequences(dataset[side], maxlen=max_seq_length)
+    for dataset, side in itertools.product([X_train, X_validation], ['left', 'right']):
+        dataset[side] = pad_sequences(dataset[side], maxlen=max_seq_length)
 
-    # # The visible layer
-    # left_input = Input(shape=(max_seq_length,), dtype='int32')
-    # right_input = Input(shape=(max_seq_length,), dtype='int32')
+    # The visible layer
+    left_input = Input(shape=(max_seq_length,), dtype='int32')
+    right_input = Input(shape=(max_seq_length,), dtype='int32')
 
-    left_input_text = Input(shape=(1,), dtype="string")
-    right_input_text = Input(shape=(1,), dtype="string")
-
-    # embedding_layer = Embedding(len(embeddings), embedding_dim, weights=[embeddings], input_length=max_seq_length,
-    #                             trainable=False)
-
-    embedding_layer = ElmoEmbeddingLayer(embedding_dim, input_length=1)
+    embedding_layer = Embedding(len(embeddings), embedding_dim, weights=[embeddings], input_length=max_seq_length,
+                                trainable=False)
 
     # Embedded version of the inputs
-    encoded_left = embedding_layer(left_input_text)
-    encoded_right = embedding_layer(right_input_text)
+    encoded_left = embedding_layer(left_input)
+    encoded_right = embedding_layer(right_input)
+
+    print(encoded_left)
 
     # Since this is a siamese network, both sides share the same LSTM
     shared_gru = GRU(n_hidden, name='gru')
@@ -69,11 +83,11 @@ def run_gru_elmo_benchmark(train_df, test_df, sent_cols, sim_col, validation_por
     right_output = shared_gru(encoded_right)
 
     # Calculates the distance as defined by the MaLSTM model
-    magru_distance = Lambda(function=lambda x: exponent_neg_manhattan_distance(x[0], x[1]),
+    magru_distance = Lambda(function=lambda x: exponent_neg_euclidean_distance(x[0], x[1]),
                             output_shape=lambda x: (x[0][0], 1))([left_output, right_output])
 
     # Pack it all up into a model
-    magru = Model([left_input_text, right_input_text], [magru_distance])
+    magru = Model([left_input, right_input], [magru_distance])
 
     optimizer = optimizer
 

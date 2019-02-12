@@ -8,4 +8,5 @@ def exponent_neg_manhattan_distance(left, right):
 
 def exponent_neg_euclidean_distance(left, right):
     """ Helper function for the similarity estimate of the LSTMs outputs"""
-    return K.exp(-K.sqrt(K.sum(K.square(K.abs(left - right)), axis=1, keepdims=True)))
+
+    return K.sqrt(K.sum(K.square(left - right), axis=-1, keepdims=True))

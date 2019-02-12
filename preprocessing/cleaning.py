@@ -40,7 +40,6 @@ def clean_text(text):
     return text
 
 
-
 def text_to_word_list(text):
     ''' Pre process and convert texts to a list of words '''
     text = str(text)

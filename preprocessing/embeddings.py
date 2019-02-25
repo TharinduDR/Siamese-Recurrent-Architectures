@@ -101,7 +101,6 @@ def prepare_embeddings(model, datasets, question_cols):
 
 
 def prepare_embeddings_elmo(model, datasets, question_cols):
-
     vocabulary = dict()
     inverse_vocabulary = ['<unk>']
     questions_cols = question_cols
@@ -140,7 +139,6 @@ def prepare_embeddings_elmo(model, datasets, question_cols):
             embeddings[index] = model.word_vec(word)
 
     return embeddings, embedding_dim
-
 
 
 def prepare_spanish_embeddings(model, datasets, question_cols):

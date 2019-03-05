@@ -24,3 +24,13 @@ def load_para(path):
     glove2word2vec(path, tmp_file)
     para = gensim.models.KeyedVectors.load_word2vec_format(tmp_file, unicode_errors="ignore")
     return para
+
+
+def load_arabic_word2vec(path):
+    model = gensim.models.Word2Vec.load(path)
+    return model
+
+
+def load_spanish_glove(path):
+    model = gensim.models.KeyedVectors.load_word2vec_format(path, binary=False)
+    return model

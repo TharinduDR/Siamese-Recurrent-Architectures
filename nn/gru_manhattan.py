@@ -1,7 +1,7 @@
 import itertools
 
 from keras import Input, Model
-from keras.layers import Embedding, GRU, Lambda
+from keras.layers import Embedding, GRU, Lambda, CuDNNGRU
 from keras_preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 
@@ -42,6 +42,7 @@ def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=
     validation_size = int(validation_portion * len(train_df))
     training_size = len(train_df) - validation_size
 
+
     X = train_df[sent_cols]
     Y = train_df[sim_col]
 
@@ -72,7 +73,7 @@ def run_gru_benchmark(train_df, test_df, sent_cols, sim_col, validation_portion=
     encoded_right = embedding_layer(right_input)
 
     # Since this is a siamese network, both sides share the same LSTM
-    shared_gru = GRU(n_hidden, name='gru')
+    shared_gru = GRU(n_hidden, name='gru', recurrent_activation='sigmoid', reset_after=True)
     # shared_gru = GRU(n_hidden, name='gru', return_sequences=True,
     #                  kernel_initializer=glorot_normal(seed=12300),
     #                  recurrent_initializer=orthogonal(gain=1.0, seed=10000))

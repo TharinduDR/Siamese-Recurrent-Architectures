@@ -1,62 +1,8 @@
 from enum import Enum
 
 import numpy as np
-from flair.data import Sentence
-from flair.embeddings import BertEmbeddings
 
-from preprocessing.cleaning import text_to_word_list, text_to_arabic_word_list, clean_text
-
-
-def prepare_bert_embeddings(datasets, question_cols):
-    sentence_list = []
-    bert = BertEmbeddings("bert-base-uncased")
-    vocabulary = dict()
-    inverse_vocabulary = ['<unk>']
-    questions_cols = question_cols
-    # Iterate over the questions only of both training and test datasets
-    for dataset in datasets:
-        for index, row in dataset.iterrows():
-
-            # Iterate through the text of both questions of the row
-            for question in questions_cols:
-                sentence_list.append(row[question])
-                q2n = []  # q2n -> question numbers representation
-                for word in text_to_word_list(row[question]):
-
-                    if word not in vocabulary:
-                        vocabulary[word] = len(inverse_vocabulary)
-                        q2n.append(len(inverse_vocabulary))
-                        inverse_vocabulary.append(word)
-                    else:
-                        q2n.append(vocabulary[word])
-
-                # Replace questions as word to question as number representationindex, question, q2n
-                dataset.set_value(index, question, q2n)
-
-    embedding_dim = 3072
-    embeddings = 1 * np.random.randn(len(vocabulary) + 1, embedding_dim)  # This will be the embedding matrix
-    embeddings[0] = 0  # So that the padding will be ignored
-
-    # Build the embedding matrix
-    for word, index in vocabulary.items():
-        embeddings[index] = get_bert_embedding(bert, word, sentence_list)
-
-    return embeddings, embedding_dim
-
-
-def get_bert_embedding(bert, word, sentence_list):
-    for sent in sentence_list:
-        for sub_word in text_to_word_list(sent):
-            if word == sub_word:
-                text = clean_text(sent)
-                # create a sentence
-                sentence = Sentence(text)
-
-                # embed words in sentence
-                bert.embed(sentence)
-                for token in sentence:
-                    if word == token.text:
-                        return token.embedding.data.numpy()
+from preprocessing.cleaning import text_to_word_list, text_to_arabic_word_list
 
 
 def prepare_embeddings(model, datasets, question_cols):
@@ -74,7 +20,7 @@ def prepare_embeddings(model, datasets, question_cols):
                 q2n = []  # q2n -> question numbers representation
                 for word in text_to_word_list(row[question]):
 
-                    # Check for unwanted words
+                    # # Check for unwanted words
                     if word not in model.vocab:
                         continue
 
@@ -138,7 +84,7 @@ def prepare_embeddings_elmo(model, datasets, question_cols):
         if word in model.vocab:
             embeddings[index] = model.word_vec(word)
 
-    return embeddings, embedding_dim
+    return embeddings, embedding_dim, inverse_vocabulary
 
 
 def prepare_spanish_embeddings(model, datasets, question_cols):
